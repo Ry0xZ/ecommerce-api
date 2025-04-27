@@ -1,0 +1,24 @@
+[
+  {
+    "title": "Producto A",
+    "description": "Descripción del producto A",
+    "price": 45000,
+    "thumbnail": "ruta/a/imagen.jpg",
+    "code": "12345",
+    "stock": 23,
+    "status": true,
+    "category": "Electrónica",
+    "id": 1
+  },
+  {
+    "title": "Producto B Actualizado",
+    "description": "Descripción del producto B Actualizado",
+    "price": 31000,
+    "thumbnail": "ruta/a/imagen2.jpg",
+    "code": "14345",
+    "stock": 12,
+    "status": true,
+    "category": "Electrónica",
+    "id": 2
+  }
+]
