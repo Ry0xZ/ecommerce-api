@@ -1,10 +1,9 @@
 const express = require('express');
 const ProductManager = require('../managers/ProductManager');
-const productManager = new ProductManager('./src/data/products.json'); // Ruta al archivo de productos
+const productManager = new ProductManager('./src/data/products.json');
 
 const router = express.Router();
 
-// Ruta para obtener todos los productos
 router.get('/', async (req, res) => {
   try {
     const products = await productManager.getProducts();
@@ -14,10 +13,9 @@ router.get('/', async (req, res) => {
   }
 });
 
-// Ruta para obtener un producto por su ID
 router.get('/:pid', async (req, res) => {
   try {
-    const product = await productManager.getProductById(parseInt(req.params.pid)); // Obtener el producto por ID
+    const product = await productManager.getProductById(parseInt(req.params.pid));
     if (!product) {
       return res.status(404).json({ error: 'Producto no encontrado' });
     }
@@ -27,7 +25,7 @@ router.get('/:pid', async (req, res) => {
   }
 });
 
-// Ruta para agregar un nuevo producto
+
 router.post('/', async (req, res) => {
     const { title, description, price, thumbnail, code, stock, status, category } = req.body;
     if (!title || !description || !price || !thumbnail || !code || !stock || status === undefined || !category) {
@@ -42,7 +40,6 @@ router.post('/', async (req, res) => {
     }
   });
 
- // Ruta para actualizar un producto
 router.put('/:pid', async (req, res) => {
     const { pid } = req.params;
     const { title, description, price, thumbnail, code, stock, status, category } = req.body;
@@ -62,7 +59,6 @@ router.put('/:pid', async (req, res) => {
     }
   }); 
 
-// Ruta para eliminar un producto por su ID
 router.delete('/:pid', async (req, res) => {
   const { pid } = req.params;
   try {

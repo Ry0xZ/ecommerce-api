@@ -2,10 +2,10 @@ const express = require('express');
 const app = express();
 const PORT = 8080;
 
-const productsRouter = require('./src/routes/products.router');
-const cartsRouter = require('./src/routes/carts.router');
+const productsRouter = require('./routes/products.router');
+const cartsRouter = require('./routes/carts.router');
 
-// Manejar JSON
+// Manejo de JSON
 app.use(express.json()); 
 
 // Rutas
