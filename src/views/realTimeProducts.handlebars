@@ -6,6 +6,7 @@
   <input type="number" name="price" placeholder="Precio" required />
   <input type="text" name="thumbnail" placeholder="URL imagen" />
   <input type="text" name="code" placeholder="Código" required />
+  <input type="text" name="category" placeholder="Categoría" required />
   <input type="number" name="stock" placeholder="Stock" required />
   <button type="submit">Agregar producto</button>
 </form>
@@ -19,7 +20,10 @@
     <div class="contentBx" style="padding: 10px;">
       <h2>{{this.title}}</h2>
       <p>{{this.description}}</p>
-      <p><strong>${{this.price}}</strong></p>
+      <p><strong>Precio:</strong> ${{this.price}}</p>
+      <p><strong>Categoría:</strong> {{this.category}}</p>
+      <p><strong>Código:</strong> {{this.code}}</p>
+      <p><strong>Stock:</strong> {{this.stock}}</p>
       <button onclick="deleteProduct({{this.id}})" style="background: red; color: white; border: none; padding: 8px; cursor: pointer;">Eliminar</button>
     </div>
   </div>
@@ -61,7 +65,10 @@
         <div class="contentBx" style="padding: 10px;">
           <h2>${product.title}</h2>
           <p>${product.description}</p>
-          <p><strong>$${product.price}</strong></p>
+          <p><strong>Precio:</strong> $${product.price}</p>
+          <p><strong>Categoría:</strong> ${product.category}</p>
+          <p><strong>Código:</strong> ${product.code}</p>
+          <p><strong>Stock:</strong> ${product.stock}</p>
           <button onclick="deleteProduct(${product.id})" style="background: red; color: white; border: none; padding: 8px; cursor: pointer;">Eliminar</button>
         </div>
       `;

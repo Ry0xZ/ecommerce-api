@@ -25,9 +25,10 @@
     "title": "producto C",
     "description": "descripcion del producto C",
     "price": "120000",
-    "thumbnail": "\"ruta/a/imagenc.jpg\"",
-    "code": "JVWZH3WS8",
-    "stock": "1",
+    "thumbnail": "\"ruta/a/imagen.jpg\"",
+    "code": "JVWZHWS8",
+    "category": "Electrónica",
+    "stock": "5",
     "id": 3
   }
 ]
