@@ -1,0 +1,71 @@
+<h1>Gestión en tiempo real de productos</h1>
+
+<form id="productForm">
+  <input type="text" name="title" placeholder="Título" required />
+  <input type="text" name="description" placeholder="Descripción" required />
+  <input type="number" name="price" placeholder="Precio" required />
+  <input type="text" name="thumbnail" placeholder="URL imagen" />
+  <input type="text" name="code" placeholder="Código" required />
+  <input type="number" name="stock" placeholder="Stock" required />
+  <button type="submit">Agregar producto</button>
+</form>
+
+<div id="productList" style="display: flex; flex-wrap: wrap; gap: 16px; margin-top: 20px;">
+  {{#each products}}
+  <div class="card" style="width: 250px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; padding: 10px;">
+    <div class="imgBx" style="text-align: center;">
+      <img src="{{this.thumbnail}}" alt="{{this.title}}" style="width: 100%; height: 150px; object-fit: cover;">
+    </div>
+    <div class="contentBx" style="padding: 10px;">
+      <h2>{{this.title}}</h2>
+      <p>{{this.description}}</p>
+      <p><strong>${{this.price}}</strong></p>
+      <button onclick="deleteProduct({{this.id}})" style="background: red; color: white; border: none; padding: 8px; cursor: pointer;">Eliminar</button>
+    </div>
+  </div>
+  {{/each}}
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+  document.getElementById('productForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+    const product = {};
+    formData.forEach((value, key) => product[key] = value);
+
+    socket.emit('newProduct', product);
+    e.target.reset();
+  });
+
+  function deleteProduct(id) {
+    socket.emit('deleteProduct', id);
+  }
+
+  socket.on('updateProducts', (products) => {
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
+
+    products.forEach(product => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style = 'width: 250px; border: 1px solid #ccc; border-radius: 10px; overflow: hidden; padding: 10px;';
+
+      card.innerHTML = `
+        <div class="imgBx" style="text-align: center;">
+          <img src="${product.thumbnail}" alt="${product.title}" style="width: 100%; height: 150px; object-fit: cover;">
+        </div>
+        <div class="contentBx" style="padding: 10px;">
+          <h2>${product.title}</h2>
+          <p>${product.description}</p>
+          <p><strong>$${product.price}</strong></p>
+          <button onclick="deleteProduct(${product.id})" style="background: red; color: white; border: none; padding: 8px; cursor: pointer;">Eliminar</button>
+        </div>
+      `;
+      productList.appendChild(card);
+    });
+  });
+</script>

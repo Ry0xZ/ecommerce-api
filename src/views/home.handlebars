@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Productos</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    #productList {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .card {
+      width: 250px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      overflow: hidden;
+      padding: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #fff;
+    }
+
+    .imgBx {
+      text-align: center;
+    }
+
+    .imgBx img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+    }
+
+    .contentBx {
+      padding: 10px;
+    }
+
+    .contentBx h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .contentBx p {
+      font-size: 14px;
+      color: #555;
+    }
+
+    .contentBx strong {
+      display: block;
+      margin-top: 5px;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <h1>Productos Disponibles</h1>
+
+  <div id="productList">
+    {{#each products}}
+    <div class="card">
+      <div class="imgBx">
+        <img src="{{this.thumbnail}}" alt="{{this.title}}">
+      </div>
+      <div class="contentBx">
+        <h2>{{this.title}}</h2>
+        <p>{{this.description}}</p>
+        <strong>Precio: ${{this.price}}</strong>
+        <p>Stock: {{this.stock}}</p>
+        <p>Categoría: {{this.category}}</p>
+        <p>ID: {{this.id}}</p>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</body>
+</html>

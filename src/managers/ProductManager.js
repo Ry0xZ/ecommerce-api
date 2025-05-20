@@ -3,7 +3,7 @@ const path = require('path');
 
 class ProductManager {
   constructor(filePath) {
-    this.path = filePath; 
+    this.path = path.resolve(__dirname, '..', filePath);
   }
 
 
