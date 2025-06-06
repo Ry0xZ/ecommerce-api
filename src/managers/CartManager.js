@@ -1,26 +1,18 @@
-const fs = require('fs').promises;
 const path = require('path');
+const { readFile, writeFile } = require('../utils/fileManager');
 
 class CartManager {
   constructor(filePath) {
-    this.path = filePath;
+    this.path = path.resolve(__dirname, '..', filePath);
   }
-
 
   async _readFile() {
-    try {
-      const data = await fs.readFile(this.path, 'utf-8');
-      return JSON.parse(data || '[]');
-    } catch (err) {
-      return [];
-    }
+    return await readFile(this.path);
   }
-
 
   async _writeFile(data) {
-    await fs.writeFile(this.path, JSON.stringify(data, null, 2));
+    await writeFile(this.path, data);
   }
-
 
   async createCart() {
     const carts = await this._readFile();
@@ -33,17 +25,14 @@ class CartManager {
     return newCart;
   }
 
-
   async getCarts() {
     return await this._readFile();
   }
-
 
   async getCartById(id) {
     const carts = await this._readFile();
     return carts.find(cart => cart.id === id);
   }
-
 
   async addProductToCart(cartId, productId) {
     const carts = await this._readFile();
@@ -54,10 +43,8 @@ class CartManager {
 
     const productIndex = cart.products.findIndex(item => item.product === productId);
     if (productIndex === -1) {
-
       cart.products.push({ product: productId, quantity: 1 });
     } else {
-
       cart.products[productIndex].quantity += 1;
     }
 

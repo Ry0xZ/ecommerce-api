@@ -1,70 +1,61 @@
-const fs = require('fs').promises;  
-const path = require('path');  
+const path = require('path');
+const { readFile, writeFile } = require('../utils/fileManager');
 
 class ProductManager {
   constructor(filePath) {
     this.path = path.resolve(__dirname, '..', filePath);
   }
 
-
-  async _readFile() {
-    try {
-      const data = await fs.readFile(this.path, 'utf-8');
-      return JSON.parse(data || '[]');
-    } catch (err) {
-      return [];
-    }
-  }
-
-  async _writeFile(data) {
-    await fs.writeFile(this.path, JSON.stringify(data, null, 2));
-  }
-
   async getProducts() {
-    return await this._readFile();
+    return await readFile(this.path);
   }
 
   async getProductById(id) {
-    const products = await this._readFile();
+    const products = await readFile(this.path);
     return products.find(product => product.id === id);
   }
 
   async addProduct(product) {
-    const products = await this._readFile();
+    const products = await readFile(this.path);
+
+    const exists = products.some(p => p.code === product.code);
+    if (exists) {
+      throw new Error('Ya existe un producto con ese código');
+    }
+
     const newProduct = {
       ...product,
       id: this._generateUniqueId(products),
     };
 
     products.push(newProduct);
-    await this._writeFile(products);
+    await writeFile(this.path, products);
     return newProduct;
   }
 
   async updateProduct(id, updates) {
-    const products = await this._readFile();
+    const products = await readFile(this.path);
     const index = products.findIndex(product => product.id === id);
 
     if (index === -1) {
       return { error: 'Producto no encontrado' };
     }
 
-   
     const updatedProduct = { ...products[index], ...updates };
     products[index] = updatedProduct;
-    await this._writeFile(products);
+    await writeFile(this.path, products);
     return updatedProduct;
   }
 
   async deleteProduct(id) {
-    const products = await this._readFile();
+    const products = await readFile(this.path);
     const newProducts = products.filter(product => product.id !== id);
 
     if (newProducts.length === products.length) {
       return { error: 'Producto no encontrado' };
     }
 
-    await this._writeFile(newProducts);
+    await writeFile(this.path, newProducts);
     return { message: 'Producto eliminado correctamente' };
   }
 

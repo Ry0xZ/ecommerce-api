@@ -1,0 +1,45 @@
+<h1>Productos</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 20px;">
+  {{#each products}}
+  <div style="border: 1px solid #ccc; border-radius: 8px; width: 250px; box-shadow: 0 0 8px rgba(0,0,0,0.1); overflow: hidden;">
+    <div class="imgBx" style="text-align: center;">
+      <img src="{{thumbnail}}" alt="{{title}}" style="width: 100%; height: 150px; object-fit: cover;">
+    </div>
+    <div class="contentBx" style="padding: 10px;">
+      <h2>{{title}}</h2>
+      <p>{{description}}</p>
+      <p><strong>Precio:</strong> ${{price}}</p>
+      <p><strong>Categoría:</strong> {{category}}</p>
+      <p><strong>Código:</strong> {{code}}</p>
+      <p><strong>Stock:</strong> {{stock}}</p>
+      <a href="/products/{{_id}}" style="display: block; margin-bottom: 10px;">Ver detalle</a>
+      <form onsubmit="addToCart(event, '{{_id}}')">
+        <button type="submit" style="background: #28a745; color: white; border: none; padding: 8px; cursor: pointer;">Agregar al carrito</button>
+      </form>
+    </div>
+  </div>
+  {{/each}}
+</div>
+
+<div style="margin-top: 20px;">
+  {{#if hasPrevPage}}<a href="/products?page={{prevPage}}">⬅️ Anterior</a>{{/if}}
+  Página {{page}}
+  {{#if hasNextPage}}<a href="/products?page={{nextPage}}">Siguiente ➡️</a>{{/if}}
+</div>
+
+<script>
+  const cartId = '{{cartId}}';
+
+  async function addToCart(event, productId) {
+    event.preventDefault();
+    const res = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+      method: 'POST'
+    });
+    const data = await res.json();
+    if (data.error) {
+      alert("Error al agregar producto");
+    } else {
+      alert("Producto agregado al carrito");
+    }
+  }
+</script>

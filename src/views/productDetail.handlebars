@@ -1,0 +1,36 @@
+<h1>Detalle del producto</h1>
+<div style="display: flex; justify-content: center; margin-top: 20px;">
+  <div style="border: 1px solid #ccc; border-radius: 8px; width: 350px; box-shadow: 0 0 8px rgba(0,0,0,0.1); overflow: hidden;">
+    <div class="imgBx" style="text-align: center;">
+      <img src="{{product.thumbnail}}" alt="{{product.title}}" style="width: 100%; height: 200px; object-fit: cover;">
+    </div>
+    <div class="contentBx" style="padding: 10px;">
+      <h2>{{product.title}}</h2>
+      <p>{{product.description}}</p>
+      <p><strong>Precio:</strong> ${{product.price}}</p>
+      <p><strong>Categoría:</strong> {{product.category}}</p>
+      <p><strong>Código:</strong> {{product.code}}</p>
+      <p><strong>Stock:</strong> {{product.stock}}</p>
+      <form onsubmit="addToCart(event, '{{product._id}}')">
+        <button type="submit" style="background: #28a745; color: white; border: none; padding: 8px; cursor: pointer;">Agregar al carrito</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  const cartId = '{{cartId}}';
+
+  async function addToCart(event, productId) {
+    event.preventDefault();
+    const res = await fetch(`/api/carts/${cartId}/product/${productId}`, {
+      method: 'POST'
+    });
+    const data = await res.json();
+    if (data.error) {
+      alert("Error al agregar producto al carrito");
+    } else {
+      alert("Producto agregado correctamente al carrito");
+    }
+  }
+</script>
