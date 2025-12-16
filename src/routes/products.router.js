@@ -1,7 +1,13 @@
 const express = require('express');
+const mongoose = require('mongoose');
+const passport = require('passport');
+const { requireRole } = require('../middlewares/authz');
+
 const Product = require('../models/Product');
+
 const router = express.Router();
 
+const isObjectId = (id) => mongoose.Types.ObjectId.isValid(id);
 
 router.get('/', async (req, res) => {
   try {
@@ -42,76 +48,102 @@ router.get('/', async (req, res) => {
   }
 });
 
-
 router.get('/:pid', async (req, res) => {
   try {
-    const product = await Product.findById(req.params.pid).lean();
+    const { pid } = req.params;
+    if (!isObjectId(pid)) {
+      return res.status(400).json({ status: 'error', message: 'ID inválido' });
+    }
+
+    const product = await Product.findById(pid).lean();
     if (!product) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
+      return res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
     }
-    res.json({ product });
+    res.json({ status: 'success', product });
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener el producto' });
+    res.status(500).json({ status: 'error', message: 'Error al obtener el producto' });
   }
 });
 
+router.post('/',
+  passport.authenticate('current', { session: false }),
+  requireRole('admin'),
+  async (req, res) => {
+    const { title, description, price, thumbnail, code, stock, status, category } = req.body;
 
-router.post('/', async (req, res) => {
-  const { title, description, price, thumbnail, code, stock, status, category } = req.body;
-
-  if (!title || !description || !price || !code || !stock || status === undefined || !category) {
-    return res.status(400).json({ error: 'Faltan datos del producto' });
-  }
-
-  try {
-    const existing = await Product.findOne({ code });
-    if (existing) {
-      return res.status(400).json({ error: 'El código ya está en uso' });
+    if (!title || !description || !price || !code || !stock || status === undefined || !category) {
+      return res.status(400).json({ status: 'error', message: 'Faltan datos del producto' });
     }
 
-    const newProduct = await Product.create({ title, description, price, thumbnail, code, stock, status, category });
-    res.status(201).json({ product: newProduct });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al agregar el producto' });
+    try {
+      const existing = await Product.findOne({ code });
+      if (existing) {
+        return res.status(400).json({ status: 'error', message: 'El código ya está en uso' });
+      }
+
+      const newProduct = await Product.create({
+        title, description, price, thumbnail, code, stock, status, category
+      });
+
+      res.status(201).json({ status: 'success', product: newProduct });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Error al agregar el producto' });
+    }
   }
-});
+);
 
+router.put('/:pid',
+  passport.authenticate('current', { session: false }),
+  requireRole('admin'),
+  async (req, res) => {
+    const { pid } = req.params;
+    const { title, description, price, thumbnail, code, stock, status, category } = req.body;
 
-router.put('/:pid', async (req, res) => {
-  const { title, description, price, thumbnail, code, stock, status, category } = req.body;
-
-  if (!title || !description || !price || !code || !stock || status === undefined || !category) {
-    return res.status(400).json({ error: 'Faltan datos para actualizar el producto' });
-  }
-
-  try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.pid,
-      { title, description, price, thumbnail, code, stock, status, category },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedProduct) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
+    if (!isObjectId(pid)) {
+      return res.status(400).json({ status: 'error', message: 'ID inválido' });
     }
 
-    res.json({ product: updatedProduct });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar el producto' });
-  }
-});
-
-
-router.delete('/:pid', async (req, res) => {
-  try {
-    const result = await Product.findByIdAndDelete(req.params.pid);
-    if (!result) {
-      return res.status(404).json({ error: 'Producto no encontrado' });
+    if (!title || !description || !price || !code || !stock || status === undefined || !category) {
+      return res.status(400).json({ status: 'error', message: 'Faltan datos para actualizar el producto' });
     }
-    res.json({ message: 'Producto eliminado correctamente' });
-  } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar el producto' });
+
+    try {
+      const updatedProduct = await Product.findByIdAndUpdate(
+        pid,
+        { title, description, price, thumbnail, code, stock, status, category },
+        { new: true, runValidators: true }
+      );
+
+      if (!updatedProduct) {
+        return res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
+      }
+
+      res.json({ status: 'success', product: updatedProduct });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Error al actualizar el producto' });
+    }
   }
-});
+);
+
+router.delete('/:pid',
+  passport.authenticate('current', { session: false }),
+  requireRole('admin'),
+  async (req, res) => {
+    try {
+      const { pid } = req.params;
+      if (!isObjectId(pid)) {
+        return res.status(400).json({ status: 'error', message: 'ID inválido' });
+      }
+
+      const result = await Product.findByIdAndDelete(pid);
+      if (!result) {
+        return res.status(404).json({ status: 'error', message: 'Producto no encontrado' });
+      }
+      res.json({ status: 'success', message: 'Producto eliminado correctamente' });
+    } catch (error) {
+      res.status(500).json({ status: 'error', message: 'Error al eliminar el producto' });
+    }
+  }
+);
 
 module.exports = router;

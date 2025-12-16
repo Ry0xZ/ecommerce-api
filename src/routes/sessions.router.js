@@ -3,6 +3,7 @@ const passport = require('passport');
 
 const User = require('../models/User');
 const Cart = require('../models/Cart');
+const UserDTO = require('../dtos/user.dto');
 const { createHash, generateToken } = require('../utils/authUtils');
 
 const router = express.Router();
@@ -37,21 +38,16 @@ router.post('/register', async (req, res) => {
       cart: cart._id
     });
 
-    res.status(201).json({
+    const safeUser = new UserDTO(user);
+
+    return res.status(201).json({
       status: 'success',
       message: 'Usuario registrado correctamente.',
-      user: {
-        id: user._id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        role: user.role,
-        cart: user.cart
-      }
+      user: safeUser
     });
   } catch (error) {
     console.error('Error en /api/sessions/register:', error);
-    res.status(500).json({
+    return res.status(500).json({
       status: 'error',
       message: 'Error interno del servidor.'
     });
@@ -70,33 +66,20 @@ router.post('/login', (req, res, next) => {
 
     if (!user) {
       let message = 'Usuario o contraseña inválidos.';
+      if (info?.message === 'User not found') message = 'El usuario no existe.';
+      else if (info?.message === 'Incorrect password') message = 'Contraseña incorrecta.';
 
-      if (info && info.message === 'User not found') {
-        message = 'El usuario no existe.';
-      } else if (info && info.message === 'Incorrect password') {
-        message = 'Contraseña incorrecta.';
-      }
-
-      return res.status(401).json({
-        status: 'error',
-        message
-      });
+      return res.status(401).json({ status: 'error', message });
     }
 
     const token = generateToken(user);
+    const safeUser = new UserDTO(user);
 
-    res.json({
+    return res.json({
       status: 'success',
       message: 'Login exitoso.',
       token,
-      user: {
-        id: user._id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        role: user.role,
-        cart: user.cart
-      }
+      user: safeUser
     });
   })(req, res, next);
 });
@@ -105,18 +88,10 @@ router.get(
   '/current',
   passport.authenticate('current', { session: false }),
   (req, res) => {
-    const user = req.user;
-
-    res.json({
+    const safeUser = new UserDTO(req.user);
+    return res.json({
       status: 'success',
-      user: {
-        id: user._id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        email: user.email,
-        role: user.role,
-        cart: user.cart
-      }
+      user: safeUser
     });
   }
 );
